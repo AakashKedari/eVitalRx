@@ -68,10 +68,13 @@ class LoginView extends StatelessWidget {
                   : Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: MaterialButton(
+                        elevation: 10,
+                        splashColor: Colors.white,
+                        textColor: Colors.white,
                         height: 40,
                         minWidth: double.infinity,
-                        shape: StadiumBorder(),
-                        color: Colors.blue.shade300,
+                        shape: const StadiumBorder(),
+                        color: Colors.blue,
                         onPressed: () {
                           /// If the user presses the elevated button instead of Done Button
                           /// on the keyboard, we unfocus  the FocusScope to remove the
@@ -85,7 +88,7 @@ class LoginView extends StatelessWidget {
                         },
                         child: 'Login'.text.make(),
                       ),
-                    )),
+                    ))
             ],
           ),
         ),

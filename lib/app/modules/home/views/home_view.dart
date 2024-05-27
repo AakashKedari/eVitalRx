@@ -1,6 +1,7 @@
+import 'dart:ui';
+
 import 'package:evital/app/data/models/user_model.dart';
 import 'package:evital/app/modules/home/controllers/home_controller.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
@@ -19,38 +20,40 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue.shade300,
-        centerTitle: true,
-        title: const Text('User StockPrice'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 5,left: 8,right: 8),
-            child: TextField(
-              controller: homeController.searchController,
-              decoration:  InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15)
+          backgroundColor: Colors.blue.shade300,
+          centerTitle: true,
+          title: const Text('User StockPrice'),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(60),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 5, left: 8, right: 8),
+              child: TextField(
+                controller: homeController.searchController,
+                decoration: InputDecoration(
+                  suffixIcon: IconButton(
+                      onPressed: () {
+                        homeController.searchController.clear();
+                        homeController
+                            .filterUsers(homeController.searchController.text);
+                      },
+                      icon: const Icon(Icons.clear)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  fillColor: Colors.white,
+                  filled: true,
+                  hintText: 'Search by name/phone/city',
+                  prefixIcon: const Icon(Icons.search),
                 ),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15)
-                ),
-                errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15)
-                ),
-                fillColor: Colors.white,
-                filled: true,
-                hintText: 'Search by name/phone/city',
-                prefixIcon: const Icon(Icons.search),
+                onChanged: (value) {
+                  homeController.filterUsers(value.toLowerCase());
+                },
               ),
-              onChanged: (value) {
-                homeController.filterUsers(value.toLowerCase());
-              },
             ),
-          ),
-        )
-
-      ),
+          )),
       body: Obx(() {
         if (homeController.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
@@ -60,54 +63,81 @@ class HomeView extends StatelessWidget {
             if (!homeController.isLoading.value &&
                 scrollInfo.metrics.pixels ==
                     scrollInfo.metrics.maxScrollExtent &&
-                homeController.filteredUsers.length != 43 && homeController.searchController.text.isEmpty) {
+                homeController.filteredUsers.length != 43 &&
+                homeController.searchController.text.isEmpty) {
               homeController.isMoreUserLoadingFlag.value = true;
               debouncer.call(homeController.loadMoreUsers);
-              Future.delayed(const Duration(seconds: 2),() =>  homeController.isMoreUserLoadingFlag.value = false);
+              Future.delayed(const Duration(seconds: 2),
+                  () => homeController.isMoreUserLoadingFlag.value = false);
             }
             return true;
           },
           child: Column(
             children: [
-
               Expanded(
                 child: ListView.builder(
-
                   itemCount: homeController.filteredUsers.length,
                   itemBuilder: (context, index) {
                     UserModel user = homeController.filteredUsers[index];
-                    return ListTile(
-                      onTap: () => _showEditDialog(context, user),
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(user.imageUrl),
-                      ),
-                      title: Text(user.name),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Phone: ${user.phoneNumber}'),
-                          Text('City: ${user.city}'),
-                          Text(
-                            'Rupee: ${user.rupeeStock} (${user.rupeeStock > 50 ? 'High' : 'Low'})',
-                            style: TextStyle(
-                              color: user.rupeeStock > 50
-                                  ? Colors.green
-                                  : Colors.red,
+                    return Card(
+                      child: ListTile(
+                        onTap: () => _showEditDialog(context, user),
+                        leading: CircleAvatar(
+                          backgroundImage:
+                              AssetImage('assets/images/arrow.png'),
+                        ),
+                        title: Text(user.name),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.phone),
+                                const Gap(5),
+                                Text(user.phoneNumber),
+                              ],
                             ),
-                          ),
-                        ],
+                            Row(
+                              children: [
+                                const Icon(Icons.location_city),
+                                const Gap(5),
+                                Text(user.city),
+                              ],
+                            ),
+                          ],
+                        ),
+                        trailing: Column(
+                          children: [
+                            Text(
+                              '₹ ${user.rupeeStock}',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: user.rupeeStock > 50
+                                    ? Colors.green
+                                    : Colors.red,
+                              ),
+                            ),
+                            Text(
+                              ' (${user.rupeeStock > 50 ? 'High' : 'Low'})',
+                              style: TextStyle(
+                                  color: user.rupeeStock > 50
+                                      ? Colors.green
+                                      : Colors.red,
+                                  fontSize: 15),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
                 ),
               ),
-
-
               if (homeController.isMoreUserLoadingFlag.value)
-                SizedBox(
+                const SizedBox(
                     height: 50,
-                    child: Center(child: LoadingIndicator(indicatorType: Indicator.ballClipRotateMultiple )))
-
+                    child: Center(
+                        child: LoadingIndicator(
+                            indicatorType: Indicator.ballClipRotateMultiple)))
             ],
           ),
         );
@@ -120,46 +150,100 @@ class HomeView extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         int currentRupee = user.rupeeStock;
-        return AlertDialog(
-          title: const Text('Change Rupee'),
-          content: TextField(
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'New Rupee'),
-            onChanged: (value) {
-              currentRupee = int.tryParse(value) ?? currentRupee;
-            },
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            title: Column(
+              children: [
+                const Text(
+                  'Change Rupees for',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Gap(10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      user.name.toString(),
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                    Text(
+                      '₹ ${user.rupeeStock.toString()}',
+                      style: TextStyle(
+                          color:
+                              user.rupeeStock > 50 ? Colors.green : Colors.red),
+                    )
+                  ],
+                )
+              ],
+            ),
+            content: TextField(
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.currency_rupee),
+                hintText: 'New Rupees',
+                labelStyle: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
+              onChanged: (value) {
+                currentRupee = int.tryParse(value) ?? currentRupee;
+              },
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  FocusScope.of(context).unfocus();
+                  Navigator.of(context).pop(currentRupee);
+                },
+                child: const Text(
+                  'Save',
+                  style: TextStyle(
+                    color: Colors.green,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  FocusScope.of(context).unfocus();
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ],
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                FocusScope.of(context).unfocus();
-                Navigator.of(context).pop(currentRupee);
-              },
-              child: const Text('Save'),
-            ),
-            TextButton(
-              onPressed: () {
-                FocusScope.of(context).unfocus();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-          ],
         );
       },
     );
 
-    if (newRupee != null && newRupee <=100 && newRupee>=0) {
-
+    if (newRupee == null) {
+      // User pressed cancel or dismissed the dialog
+    } else if (newRupee <= 100 && newRupee >= 0) {
       user.rupeeStock = newRupee;
 
       // Update the user's rupee stock in Hive
       user.save();
-
       var box = await Hive.openBox<UserModel>('userBox');
       homeController.filteredUsers.value = box.values.toList();
-    }
-    else{
+      Get.snackbar('Updated', 'Price for the User ${user.name}',
+          snackPosition: SnackPosition.BOTTOM);
+    } else {
       Get.snackbar('Error', 'Stock Rupee Out of Range',
           snackPosition: SnackPosition.BOTTOM);
     }

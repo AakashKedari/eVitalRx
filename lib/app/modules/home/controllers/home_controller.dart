@@ -23,10 +23,8 @@ class HomeController extends GetxController {
 
   @override
   void onClose() {
-    // TODO: implement onClose
     super.onClose();
     searchController.dispose();
-
   }
 
   void loadUsers() async {
@@ -34,11 +32,8 @@ class HomeController extends GetxController {
     var box = await Hive.openBox<UserModel>('userBox');
 
     if (box.isEmpty) {
-      print("###############Box is empty");
       generateDummyData(box);
     } else {
-      print("###############Box is full");
-
       // Load existing data
       var allUsers = box.values.toList();
       users.value = allUsers;
@@ -46,10 +41,9 @@ class HomeController extends GetxController {
     }
     isLoading.value = false;
   }
-  l.
+
   void generateDummyData(Box<UserModel> box) {
     List<UserModel> dummyUsers = List.generate(43, (index) {
-
       /// Here we assign random price to the items to the maximunm of 100
       Random random = Random();
       int price = random.nextInt(100);
@@ -69,7 +63,6 @@ class HomeController extends GetxController {
   }
 
   void loadMoreUsers() {
-    print('#########More Users Loading');
     Future.delayed(const Duration(seconds: 1), () {
       if ((currentPage.value * itemsPerPage) < users.length) {
         currentPage.value++;
