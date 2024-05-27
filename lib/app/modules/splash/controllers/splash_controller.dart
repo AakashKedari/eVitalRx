@@ -15,7 +15,7 @@ class SplashController extends GetxController {
   }
 
   void _navigateToHome() async {
-    await Future.delayed(const Duration(seconds: 3)); // Simulate a delay
+    await Future.delayed(const Duration(seconds: 4)); // Simulate a delay
     Get.offNamed(Routes.LOGIN); // Navigate to login screen
   }
 
