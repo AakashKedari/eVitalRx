@@ -12,17 +12,18 @@ void main() async {
   await Hive.initFlutter(appDocumentDirectory.path);
 
   Hive.registerAdapter(UserModelAdapter());
-  // await Hive.openBox('userBox'); // Open Hive box
-  // Open Hive box
+
+  /// We open the hive box later
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "Application",
+      title: "eVitalRx",
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
       theme: ThemeData(
-        textTheme: GoogleFonts.radioCanadaTextTheme()
+        textTheme: GoogleFonts.radioCanadaTextTheme(),
       ),
+      themeMode: ThemeMode.system
     ),
   );
 }

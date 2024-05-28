@@ -1,55 +1,4 @@
-// import 'package:hive/hive.dart';
-// // part 'user_model.g.dart';
-//
-// @HiveType(typeId: 0)
-// class UserModel extends HiveObject {
-//   @HiveField(0)
-//   String name;
-//
-//   @HiveField(1)
-//   String phoneNumber;
-//
-//   @HiveField(2)
-//   String city;
-//
-//   @HiveField(3)
-//   String imageUrl;
-//
-//   @HiveField(4)
-//   int rupeeStock;
-//
-//   UserModel(
-//       {required this.name,
-//       required this.phoneNumber,
-//       required this.city,
-//       required this.imageUrl,
-//       required this.rupeeStock});
-//
-//
-// }
-//
-// // Create a Hive adapter for UserModel
-// class UserModelAdapter extends TypeAdapter<UserModel> {
-//   @override
-//   final int typeId = 0; // Unique identifier for your type
-//
-//   @override
-//   UserModel read(BinaryReader reader) {
-//     final name = reader.readString();
-//     final age = reader.readInt();
-//     return UserModel(name: name, age: age);
-//   }
-//
-//   @override
-//   void write(BinaryWriter writer, UserModel obj) {
-//     writer.writeString(obj.name);
-//     writer.writeInt(obj.age);
-//   }
-// }
-
 import 'package:hive/hive.dart';
-
-// part 'user_model.g.dart';
 
 @HiveType(typeId: 0)
 class UserModel extends HiveObject {
@@ -77,7 +26,7 @@ class UserModel extends HiveObject {
   });
 }
 
-@HiveType(typeId: 0) // make sure the typeId matches the typeId of UserModel
+@HiveType(typeId: 0)
 class UserModelAdapter extends TypeAdapter<UserModel> {
   @override
   final int typeId = 0;
@@ -102,4 +51,3 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
     writer.writeInt(obj.rupeeStock);
   }
 }
-

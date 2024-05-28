@@ -29,17 +29,22 @@ class HomeController extends GetxController {
 
   void loadUsers() async {
     isLoading.value = true;
-    var box = await Hive.openBox<UserModel>('userBox');
 
-    if (box.isEmpty) {
-      generateDummyData(box);
-    } else {
-      // Load existing data
-      var allUsers = box.values.toList();
-      users.value = allUsers;
-      filteredUsers.value = users.take(itemsPerPage).toList();
-    }
-    isLoading.value = false;
+    /// Just to depict that the data is coming from server,
+    /// we delay fetching by 2 seconds
+
+    Future.delayed(const Duration(seconds: 2)).then((value) async {
+      var box = await Hive.openBox<UserModel>('userBox');
+      if (box.isEmpty) {
+        generateDummyData(box);
+      } else {
+        // Load existing data
+        var allUsers = box.values.toList();
+        users.value = allUsers;
+        filteredUsers.value = users.take(itemsPerPage).toList();
+      }
+      isLoading.value = false;
+    });
   }
 
   void generateDummyData(Box<UserModel> box) {
@@ -59,7 +64,10 @@ class HomeController extends GetxController {
       );
     });
     box.addAll(dummyUsers);
-    filteredUsers.value = dummyUsers;
+    /// Now we fill the first 20 values in list
+    var allUsers = box.values.toList();
+    users.value = allUsers;
+    filteredUsers.value = users.take(itemsPerPage).toList();
   }
 
   void loadMoreUsers() {

@@ -1,34 +1,36 @@
+import 'package:evital/app/utils/utils.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-
 import '../controllers/splash_controller.dart';
 
 class SplashView extends StatefulWidget {
+  const SplashView({super.key});
+
   @override
   _SplashViewState createState() => _SplashViewState();
 }
 
-class _SplashViewState extends State<SplashView> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+class _SplashViewState extends State<SplashView>
+    with SingleTickerProviderStateMixin {
+  late AnimationController animationController;
   late Animation<double> _animation;
   final SplashController _splashController = Get.put(SplashController());
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    animationController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
     )..repeat(reverse: true);
     _animation = Tween<double>(begin: -10, end: 10).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticIn),
+      CurvedAnimation(parent: animationController, curve: Curves.slowMiddle),
     );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    animationController.dispose();
     super.dispose();
   }
 
@@ -44,7 +46,7 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
               child: child,
             );
           },
-          child: Image.asset('assets/images/evitalRx.webp'), // Replace with your image path
+          child: Image.asset(AssetsPath.appLogo),
         ),
       ),
     );
